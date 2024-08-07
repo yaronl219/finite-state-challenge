@@ -7,11 +7,11 @@ export class Fsm {
 
   constructor({
     onStateChange,
-    stateNodes: nodes,
+    stateNodes,
     resolveInitialState,
   }: StateMachineProps) {
     this.onStateChange = onStateChange;
-    this.nodeTree = nodes.reduce(
+    this.nodeTree = stateNodes.reduce(
       (nodeTree, currNode) => ({
         ...nodeTree,
         [currNode.id]: currNode,

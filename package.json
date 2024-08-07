@@ -2,7 +2,10 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start-react-app": "npx nx serve fsm-playground",
+    "test": "npx nx test --all"
+  },
   "private": true,
   "dependencies": {
     "react": "18.3.1",
