@@ -1,0 +1,19 @@
+{
+  "name": "fsm",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "fsm/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/fsm",
+        "main": "fsm/src/index.ts",
+        "tsConfig": "fsm/tsconfig.lib.json",
+        "assets": ["fsm/*.md"]
+      }
+    }
+  }
+}
