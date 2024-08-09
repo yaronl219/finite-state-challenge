@@ -1,17 +1,14 @@
 import styled from 'styled-components';
-
-import NxWelcome from './nx-welcome';
+import { StateMachineContainer } from './components/state-machine-container/StateMachineContainer';
 
 const StyledApp = styled.div`
   // Your style here
+  
 `;
 
 export function App() {
-  return (
-    <StyledApp>
-      <NxWelcome title="fsm-playground" />
-    </StyledApp>
-  );
+
+  return <StyledApp><StateMachineContainer /></StyledApp>;
 }
 
 export default App;

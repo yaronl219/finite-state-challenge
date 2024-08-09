@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@org/fsm": ["fsm/src/index.ts"]
+      "@fsm-challenge/fsm": ["fsm/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

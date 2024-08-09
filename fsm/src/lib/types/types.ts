@@ -14,5 +14,5 @@ export interface StateNode<T> {
 export interface StateMachineProps<T> {
     stateNodes: StateNode<T>[],
     onStateChange?: (node: StateNode<T>, nodeTree: NodeTree<T>, isComplete: boolean) => void
-    resolveInitialState: (nodeTree: NodeTree<T>) => StateNode<T>
+    resolveInitialState?: (nodeTree: NodeTree<T>) => StateNode<T>
 }

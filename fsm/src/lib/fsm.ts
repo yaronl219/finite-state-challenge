@@ -3,6 +3,7 @@ import { NodeTree, StateNode, StateMachineProps } from './types/types';
 export class Fsm<T> {
   private readonly onStateChange: StateMachineProps<T>['onStateChange'];
   private readonly nodeTree: NodeTree<T>;
+  private readonly stateNodes: StateNode<T>[]
   private currentState: StateNode<T>;
 
   constructor({
@@ -11,6 +12,7 @@ export class Fsm<T> {
     resolveInitialState,
   }: StateMachineProps<T>) {
     this.onStateChange = onStateChange;
+    this.stateNodes = stateNodes
     this.nodeTree = stateNodes.reduce(
       (nodeTree, currNode) => ({
         ...nodeTree,
@@ -18,29 +20,44 @@ export class Fsm<T> {
       }),
       {}
     );
-
-    const initialState = resolveInitialState(this.nodeTree);
-    this.currentState = initialState;
+    if (resolveInitialState) {
+      this.currentState = resolveInitialState(this.nodeTree);
+    } else {
+      this.currentState = stateNodes[0]
+    }
+     
     this.fireOnEnterEvents();
   }
 
   private fireOnEnterEvents() {
-    this.currentState?.onEnterState?.(this.currentState, (id) => this.advance(id), this.nodeTree);
+    this.currentState?.onEnterState?.(
+      this.currentState,
+      (id) => this.advance(id),
+      this.nodeTree
+    );
   }
 
   private fireOnStateChangeEvent() {
-    this.onStateChange?.(this.currentState, this.nodeTree, this.getIsNodeFinal())
+    this.onStateChange?.(
+      this.currentState,
+      this.nodeTree,
+      this.getIsNodeFinal()
+    );
   }
 
   private fireOnExitEvents() {
-    this.currentState?.onExitState?.(this.currentState, (id) => this.advance(id), this.nodeTree);
+    this.currentState?.onExitState?.(
+      this.currentState,
+      (id) => this.advance(id),
+      this.nodeTree
+    );
   }
 
   private setNewState(node: StateNode<T>) {
-    this.fireOnExitEvents()
+    this.fireOnExitEvents();
     this.currentState = node;
-    this.fireOnStateChangeEvent()
-    this.fireOnEnterEvents()
+    this.fireOnStateChangeEvent();
+    this.fireOnEnterEvents();
   }
 
   /** 
@@ -48,9 +65,9 @@ export class Fsm<T> {
   @id: if there is only one state, id is optional. if id does not match possible next step, throws
   */
   public advance(id?: string): void {
-    const isCurrentStateFinal = !this.currentState.nextStateIds?.length
+    const isCurrentStateFinal = !this.currentState.nextStateIds?.length;
     if (isCurrentStateFinal) {
-      throw new Error(`Current state ${id} is the final state`)
+      throw new Error(`Current state ${id} is the final state`);
     }
 
     if (id) {
@@ -68,27 +85,43 @@ export class Fsm<T> {
       }
 
       this.setNewState(this.nodeTree[id]);
-      return
+      return;
     }
 
-    if (this.currentState.nextStateIds && this.currentState.nextStateIds.length > 1) {
-      throw new Error(`There is more that one possible next step, but id has not been provided`)
+    if (
+      this.currentState.nextStateIds &&
+      this.currentState.nextStateIds.length > 1
+    ) {
+      throw new Error(
+        `There is more that one possible next step, but id has not been provided`
+      );
     }
 
-    const nextStateId = this.currentState.nextStateIds?.[0]
-    const nextStateNode = nextStateId && this.nodeTree[nextStateId]
+    const nextStateId = this.currentState.nextStateIds?.[0];
+    const nextStateNode = nextStateId && this.nodeTree[nextStateId];
 
     if (!nextStateNode) {
       throw new Error(`id ${id} does not exist in the state machine`);
     }
-    this.setNewState(nextStateNode)
+    this.setNewState(nextStateNode);
   }
 
   public getCurrentState(): StateNode<T> {
-    return this.currentState
+    return this.currentState;
   }
 
   public getIsNodeFinal(): boolean {
-    return !this.currentState.nextStateIds?.length
+    return !this.currentState.nextStateIds?.length;
   }
- }
+
+  public getStateNodes(): StateNode<T>[] {
+      return this.stateNodes
+  }
+
+  public getNextNodes(): StateNode<T>[] {
+    if (!this.currentState.nextStateIds) {
+      return []
+    }
+    return this.currentState.nextStateIds.map(id => this.nodeTree[id]).filter(Boolean)
+  }
+}
