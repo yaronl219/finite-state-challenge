@@ -1,14 +1,18 @@
-export type NodeTree = Record<string, StateNode>
-export interface StateNode {
+export type NodeTree<T> = Record<string, StateNode<T>>
+
+export type OnChangeStateEvent<T> = (node: StateNode<T>, advance: (id?: string) => void, nodeTree: NodeTree<T>) => void 
+
+export interface StateNode<T> {
     id: string;
     name?: string
-    onEnterState?: (node: StateNode, nodeTree: NodeTree) => void 
-    onExitState?: (node: StateNode, nodeTree: NodeTree) => void 
+    onEnterState?: OnChangeStateEvent<T>
+    onExitState?: OnChangeStateEvent<T>
     nextStateIds?: string[]
+    data?: T
 }
 
-export interface StateMachineProps {
-    stateNodes: StateNode[],
-    onStateChange?: (node: StateNode, nodeTree: NodeTree, isComplete: boolean) => void
-    resolveInitialState: (nodeTree: NodeTree) => StateNode
+export interface StateMachineProps<T> {
+    stateNodes: StateNode<T>[],
+    onStateChange?: (node: StateNode<T>, nodeTree: NodeTree<T>, isComplete: boolean) => void
+    resolveInitialState: (nodeTree: NodeTree<T>) => StateNode<T>
 }

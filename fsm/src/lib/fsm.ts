@@ -1,15 +1,15 @@
 import { NodeTree, StateNode, StateMachineProps } from './types/types';
 
-export class Fsm {
-  private readonly onStateChange: StateMachineProps['onStateChange'];
-  private readonly nodeTree: NodeTree;
-  private currentState: StateNode;
+export class Fsm<T> {
+  private readonly onStateChange: StateMachineProps<T>['onStateChange'];
+  private readonly nodeTree: NodeTree<T>;
+  private currentState: StateNode<T>;
 
   constructor({
     onStateChange,
     stateNodes,
     resolveInitialState,
-  }: StateMachineProps) {
+  }: StateMachineProps<T>) {
     this.onStateChange = onStateChange;
     this.nodeTree = stateNodes.reduce(
       (nodeTree, currNode) => ({
@@ -25,7 +25,7 @@ export class Fsm {
   }
 
   private fireOnEnterEvents() {
-    this.currentState?.onEnterState?.(this.currentState, this.nodeTree);
+    this.currentState?.onEnterState?.(this.currentState, (id) => this.advance(id), this.nodeTree);
   }
 
   private fireOnStateChangeEvent() {
@@ -33,10 +33,10 @@ export class Fsm {
   }
 
   private fireOnExitEvents() {
-    this.currentState?.onExitState?.(this.currentState, this.nodeTree);
+    this.currentState?.onExitState?.(this.currentState, (id) => this.advance(id), this.nodeTree);
   }
 
-  private setNewState(node: StateNode) {
+  private setNewState(node: StateNode<T>) {
     this.fireOnExitEvents()
     this.currentState = node;
     this.fireOnStateChangeEvent()
@@ -84,7 +84,7 @@ export class Fsm {
     this.setNewState(nextStateNode)
   }
 
-  public getCurrentState(): StateNode {
+  public getCurrentState(): StateNode<T> {
     return this.currentState
   }
 

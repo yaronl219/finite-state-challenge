@@ -1,11 +1,13 @@
 import { Fsm } from './fsm';
 import { StateNode } from './types/types';
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 describe('Finite state machine tests', () => {
   describe('Happy flow tests', () => {
     describe('advancing steps tests', () => {
       it('Should alternate between states', () => {
-        const stateNodes: StateNode[] = [
+        const stateNodes: StateNode<undefined>[] = [
           {
             id: '1',
             name: 'a',
@@ -31,7 +33,7 @@ describe('Finite state machine tests', () => {
       });
 
       it('Should run until state is complete', () => {
-        const stateNodes: StateNode[] = [
+        const stateNodes: StateNode<undefined>[] = [
           {
             id: '1',
             name: 'a',
@@ -62,7 +64,7 @@ describe('Finite state machine tests', () => {
       });
 
       it('Should advance to required step', () => {
-        const stateNodes: StateNode[] = [
+        const stateNodes: StateNode<undefined>[] = [
           {
             id: '1',
             name: 'a',
@@ -85,23 +87,50 @@ describe('Finite state machine tests', () => {
           resolveInitialState: () => stateNodes[0],
         });
 
-        expect(fsm.getCurrentState()).toEqual(stateNodes[0])
-        fsm.advance('2')
+        expect(fsm.getCurrentState()).toEqual(stateNodes[0]);
+        fsm.advance('2');
+
+        expect(fsm.getCurrentState()).toEqual(stateNodes[1]);
+        fsm.advance('1');
+
+        expect(fsm.getCurrentState()).toEqual(stateNodes[0]);
+        fsm.advance('3');
+
+        expect(fsm.getCurrentState()).toEqual(stateNodes[2]);
+      });
+
+      it('Should create self logic to advance every second', async () => {
+        const stateNodes: StateNode<undefined>[] = [
+          {
+            id: '1',
+            name: 'a',
+            nextStateIds: ['2'],
+            onEnterState: (_, advance) => {
+              setTimeout(() => {
+                advance('2');
+              }, 500);
+            },
+          },
+          {
+            id: '2',
+            name: 'b',
+          },
+        ];
+
+        const fsm = new Fsm({
+          stateNodes,
+          resolveInitialState: () => stateNodes[0],
+        });
+
+        await sleep(1000);
 
         expect(fsm.getCurrentState()).toEqual(stateNodes[1])
-        fsm.advance('1')
-
-        expect(fsm.getCurrentState()).toEqual(stateNodes[0])
-        fsm.advance('3')
-
-        expect(fsm.getCurrentState()).toEqual(stateNodes[2])
-
       });
     });
 
     describe('events tests', () => {
       it('Should fire state change event', () => {
-        const stateNodes: StateNode[] = [
+        const stateNodes: StateNode<undefined>[] = [
           {
             id: '1',
             name: 'a',
