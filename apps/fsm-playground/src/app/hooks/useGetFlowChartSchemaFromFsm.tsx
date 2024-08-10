@@ -1,64 +1,82 @@
 import type { Fsm, StateNode } from '@fsm-challenge/fsm';
-import { useMemo, useCallback } from 'react';
-import { ActiveState } from '../types/active-state';
+import { useMemo, useCallback, useEffect } from 'react';
 
 import {
   type Node as FlowChartNode,
   type Edge as FlowChartEdge,
   MarkerType,
+  useNodesState,
+  useEdgesState,
 } from '@xyflow/react';
+import { nodeSize } from '../consts/node-size';
+import { isEqual } from 'lodash';
 
 export interface FlowChartSchema {
   nodes: FlowChartNode[];
   edges: FlowChartEdge[];
 }
 
-export function useGetFlowChartSchemaFromFsm<T>(fsm: Fsm<T>): FlowChartSchema {
-  const nodeSize = 100;
-
-  const getFlowChartNode = useCallback(
-    (stateNode: StateNode<T>, idx: number): FlowChartNode => {
-      return {
-        id: stateNode.id,
-        position: { x: 0, y: idx * nodeSize * 2 },
-        measured: { width: nodeSize, height: nodeSize },
-        type: 'customNode',
-        data: {
-          id: stateNode.id,
-          label: stateNode.name,
-        },
-      };
+const getFlowChartNode = (
+  stateNode: StateNode<any>,
+  idx: number,
+  previousState?: FlowChartNode
+): FlowChartNode => {
+  return {
+    id: stateNode.id,
+    position: previousState?.position ?? { x: 0, y: idx * nodeSize * 2 },
+    measured: { width: nodeSize, height: nodeSize },
+    type: 'customNode',
+    data: {
+      id: stateNode.id,
+      label: stateNode.name,
     },
-    []
-  );
+  };
+};
 
-  const getEdgesFromStateNode = useCallback(
-    (stateNode: StateNode<T>): FlowChartEdge[] => {
-      if (!stateNode.nextStateIds) {
-        return [];
-      }
-      return stateNode.nextStateIds.map((nextStateId) => ({
-        id: `${stateNode.id} - ${nextStateId}`,
-        target: nextStateId,
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-        },
-        source: stateNode.id,
-      }));
+const getEdgesFromStateNode = (stateNode: StateNode<T>): FlowChartEdge[] => {
+  if (!stateNode.nextStateIds) {
+    return [];
+  }
+  return stateNode.nextStateIds.map((nextStateId) => ({
+    id: `${stateNode.id} - ${nextStateId}`,
+    target: nextStateId,
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
     },
-    []
-  );
+    type: 'buttonEdge',
+    source: stateNode.id,
+  }));
+};
 
-  return useMemo(() => {
-    const nodes: FlowChartNode[] = [];
-    const edges: FlowChartEdge[] = [];
+export function useGetFlowChartSchemaFromFsm<T>(fsm: Fsm<T>) {
+  const [nodes, setNodes, onNodesChange] = useNodesState<FlowChartNode>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<FlowChartEdge>([]);
+
+  useEffect(() => {
+    const newNodes: FlowChartNode[] = [];
+    const newEdges: FlowChartEdge[] = [];
 
     const stateNodes = fsm.getStateNodes();
     stateNodes.forEach((node, idx) => {
-      nodes.push(getFlowChartNode(node, idx));
-      edges.push(...getEdgesFromStateNode(node));
+      newNodes.push(getFlowChartNode(node, idx, nodes[idx]));
+      newEdges.push(...getEdgesFromStateNode(node));
     });
 
-    return { nodes, edges };
-  }, [fsm, getEdgesFromStateNode, getFlowChartNode]);
+    if (isEqual(newNodes, nodes) && isEqual(newEdges, edges)) {
+        return
+    }
+
+    setNodes(newNodes);
+    setEdges(newEdges)
+  }, [edges, fsm, nodes, setEdges, setNodes]);
+
+  return {
+    setEdges,
+    setNodes,
+    nodes,
+    edges,
+    onEdgesChange,
+    onNodesChange
+  };
+
 }

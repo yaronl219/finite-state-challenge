@@ -35,8 +35,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   };
 
 export const useAutoLayoutNodes = (
-  nodes: Node[],
-  edges: Edge[],
   setNodes: (nodes: Node[]) => void,
   setEdges: (edges: Edge[]) => void
 ) => {
@@ -50,9 +48,6 @@ export const useAutoLayoutNodes = (
     [setEdges, setNodes]
   );
 
-  useEffect(() => {
-    layoutNodes(nodes, edges)
-  }, [layoutNodes, nodes, edges])
   return {
     layoutNodes
   }

@@ -4,28 +4,21 @@ import { ReactFlowProvider } from '@xyflow/react';
 import { Fsm } from '@fsm-challenge/fsm';
 import styled from 'styled-components';
 import { Button } from '@mui/material';
+import { useStateMachineContext } from '../../context/active-state-context/StateMachineContext';
 
 interface RightPaneProps {
-  fsm: Fsm<any>;
-  onConnectEdge: (sourceId: string, targetId: string) => void;
-  onRemoveConnection: (sourceId: string, targetId: string) => void;
-  onCreateNewNode: () => void
+
 }
 
 export const RightPane: React.FC<RightPaneProps> = ({
-  fsm,
-  onConnectEdge,
-  onRemoveConnection,
-  onCreateNewNode
 }) => {
+    const {onConnectSteps, fsm, onCreateNode} = useStateMachineContext()
   return (
     <StyledRightPane>
-        <Button onClick={onCreateNewNode}>Create new state</Button>
       <ReactFlowProvider>
         <LayoutFlow
           fsm={fsm}
-          onConnectEdge={onConnectEdge}
-          onRemoveConnection={onRemoveConnection}
+          onConnectEdge={onConnectSteps}
         />
       </ReactFlowProvider>
     </StyledRightPane>
@@ -35,4 +28,5 @@ export const RightPane: React.FC<RightPaneProps> = ({
 const StyledRightPane = styled.div`
   display: flex;
   flex-direction: column;
+  padding: 1rem;
 `;

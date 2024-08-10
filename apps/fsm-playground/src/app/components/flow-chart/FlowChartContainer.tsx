@@ -4,8 +4,14 @@ import '@xyflow/react/dist/style.css';
 import { CustomNode } from './CustomNode';
 import { Fsm } from '@fsm-challenge/fsm';
 import { useGetFlowChartSchemaFromFsm } from '../../hooks/useGetFlowChartSchemaFromFsm';
+
+import { CustomEdge } from './ButtonEdge';
+import styled from 'styled-components';
 import { useAutoLayoutNodes } from '../../hooks/useAutoLayoutNodes';
-import { useEffect } from 'react';
+import { PrimaryIconButton } from '../design-components/PrimaryIconButton';
+import { AddOutlined, CategoryOutlined } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
+import { useStateMachineContext } from '../../context/active-state-context/StateMachineContext';
 
 const customNodes = {
   customNode: CustomNode,
@@ -14,51 +20,60 @@ const customNodes = {
 interface LayoutFlowProps {
   fsm: Fsm<any>;
   onConnectEdge: (sourceId: string, targetId: string) => void;
-  onRemoveConnection: (sourceId: string, targetId: string) => void;
 }
 
 export const LayoutFlow: React.FC<LayoutFlowProps> = ({
   fsm,
   onConnectEdge,
-  onRemoveConnection
 }) => {
-  const { nodes: initialNodes, edges: initialEdges } =
+  const {onCreateNode} = useStateMachineContext()
+
+  const { nodes, edges, onEdgesChange, onNodesChange, setEdges, setNodes } =
     useGetFlowChartSchemaFromFsm(fsm);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-  useEffect(() => {
-    setNodes(initialNodes);
-  }, [initialNodes, setNodes]);
-
-  useEffect(() => {
-    setEdges(initialEdges);
-  }, [initialEdges, setEdges]);
-
-  const { layoutNodes } = useAutoLayoutNodes(
-    initialNodes,
-    initialEdges,
-    setNodes,
-    setEdges
-  );
-
-  const onEdgesDelete = (edges: Edge[]) => {
-    edges.forEach(({source, target}) => onRemoveConnection(source, target))
-  };
-
+  const { layoutNodes } = useAutoLayoutNodes(setNodes, setEdges);
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
+    <StyledContainer>
+      <FloatingButtonsContainer>
+        <PrimaryIconButton onClick={onCreateNode}>
+          <Tooltip placement='left' title="Create a new node">
+            <AddOutlined />
+          </Tooltip>
+        </PrimaryIconButton>
+        <PrimaryIconButton onClick={() => layoutNodes(nodes, edges)}>
+          <Tooltip placement='left' title="Relayout the nodes">
+            <CategoryOutlined />
+          </Tooltip>
+        </PrimaryIconButton>
+      </FloatingButtonsContainer>
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        edgeTypes={{ buttonEdge: CustomEdge }}
         nodeTypes={customNodes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={({ source, target }) => onConnectEdge(source, target)}
-        onEdgesDelete={onEdgesDelete}
         fitView
+        fitViewOptions={{
+          padding: 0.2,
+        }}
       />
-    </div>
+    </StyledContainer>
   );
 };
+
+const StyledContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+`;
+
+const FloatingButtonsContainer = styled.div`
+  position: absolute;
+  right: 0;
+  z-index: 1;
+  flex-direction: column;
+  display: flex;
+  gap: 0.5rem;
+`;

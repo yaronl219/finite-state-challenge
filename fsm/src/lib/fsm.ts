@@ -60,6 +60,14 @@ export class Fsm<T> {
     this.fireOnEnterEvents();
   }
 
+  public setActiveStateById(id: string) {
+    if (!this.nodeTree[id]) {
+      throw new Error(`id ${id} does not exist in the state machine`);
+    }
+
+    this.setNewState(this.nodeTree[id]);
+  }
+
   /** 
   advance to the next state
   @id: if there is only one state, id is optional. if id does not match possible next step, throws
@@ -123,5 +131,9 @@ export class Fsm<T> {
       return []
     }
     return this.currentState.nextStateIds.map(id => this.nodeTree[id]).filter(Boolean)
+  }
+
+  public getStateById(id: string) {
+    return this.nodeTree[id]
   }
 }

@@ -1,32 +1,33 @@
-import { StateNode } from '@fsm-challenge/fsm';
 import React from 'react';
-import { ActiveState } from '../../types/active-state';
 import styled from 'styled-components';
 import { StateNodeContainer } from '../state-node/StateNodeContainer';
 import { Button } from '@mui/material';
+import { useStateMachineContext } from '../../context/active-state-context/StateMachineContext';
+import { TitleContainer } from './TitleContainer';
+import { StatePlayer } from './StatePlayer';
+import { EmptyState } from './EmptyState';
 
 interface StatePlayerContainerProps<T> {
-  activeState: ActiveState<T>;
-  onClickNextState: (id: string) => void;
+  //   activeState: ActiveState<T>;
+  //   onClickNextState: (id: string) => void;
 }
 
 export const StatePlayerContainer: React.FC<
   StatePlayerContainerProps<unknown>
-> = ({ activeState, onClickNextState }) => {
+> = () => {
+  const { activeState, onAdvanceStep, onRenameNode } = useStateMachineContext();
   return (
     <StyledContainer>
-      <StateNodeContainer title={activeState.name} isActive={true} />
-      <ButtonContainer>
-        {activeState.nextStates.map((nextState) => (
-          <Button
-            variant="contained"
-            key={nextState.id}
-            onClick={() => onClickNextState(nextState.id)}
-          >
-            {nextState.name}
-          </Button>
-        ))}
-      </ButtonContainer>
+      <TitleContainer />
+      {activeState ? (
+        <StatePlayer
+          onAdvanceStep={onAdvanceStep}
+          onRenameNode={onRenameNode}
+          activeState={activeState}
+        />
+      ) : (
+        <EmptyState />
+      )}
     </StyledContainer>
   );
 };
@@ -34,10 +35,5 @@ export const StatePlayerContainer: React.FC<
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
-`;
-
-const ButtonContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 1rem;
+  padding: 1rem;
 `;
