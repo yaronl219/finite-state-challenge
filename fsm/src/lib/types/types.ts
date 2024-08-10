@@ -7,7 +7,7 @@ export interface StateNode<T> {
     name?: string
     onEnterState?: OnChangeStateEvent<T>
     onExitState?: OnChangeStateEvent<T>
-    nextStateIds?: string[]
+    nextStateIds?: {id: string, action?: string}[]
     data?: T
 }
 

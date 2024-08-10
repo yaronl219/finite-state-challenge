@@ -80,7 +80,7 @@ export class Fsm<T> {
 
     if (id) {
       const isIdPossibleForNextStep = this.currentState.nextStateIds?.find(
-        (_id) => id === _id
+        (nextStateId) => id === nextStateId.id
       );
       if (!isIdPossibleForNextStep) {
         throw new Error(
@@ -105,7 +105,7 @@ export class Fsm<T> {
       );
     }
 
-    const nextStateId = this.currentState.nextStateIds?.[0];
+    const nextStateId = this.currentState.nextStateIds?.[0]?.id;
     const nextStateNode = nextStateId && this.nodeTree[nextStateId];
 
     if (!nextStateNode) {
@@ -130,7 +130,7 @@ export class Fsm<T> {
     if (!this.currentState.nextStateIds) {
       return []
     }
-    return this.currentState.nextStateIds.map(id => this.nodeTree[id]).filter(Boolean)
+    return this.currentState.nextStateIds.map(({id}) => this.nodeTree[id]).filter(Boolean)
   }
 
   public getStateById(id: string) {

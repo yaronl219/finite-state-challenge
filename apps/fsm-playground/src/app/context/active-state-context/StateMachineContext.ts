@@ -12,6 +12,7 @@ interface IStateMachineContext {
   stateNodes: StateNode<any>[];
   onRenameNode: (nodeId: string, newName: string) => void;
   onRemoveNode: (nodeId: string) => void
+  onRenameAction: (sourceId: string, targetId: string, newName: string) => void
   fsm: Fsm<any>;
 }
 
@@ -25,6 +26,7 @@ export const StateMachineContext = React.createContext<IStateMachineContext>({
   stateNodes: [],
   onRenameNode: () => undefined,
   onRemoveNode: () => undefined,
+  onRenameAction: () => undefined,
   fsm: new Fsm({ stateNodes: [] }),
 });
 

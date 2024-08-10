@@ -36,5 +36,5 @@ const StyledNode = styled.div<{ isActive: boolean }>`
   align-items: center;
   height: 3rem;
   width: ${nodeSize}px;
-  background-color: ${({ isActive }) => (isActive ? '#91bce6' : 'white')};
+  background-color: ${({ isActive }) => (isActive ? '#91bce6' : '#d6ebff')};
 `;

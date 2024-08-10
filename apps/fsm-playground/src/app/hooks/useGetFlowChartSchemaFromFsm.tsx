@@ -33,18 +33,22 @@ const getFlowChartNode = (
   };
 };
 
-const getEdgesFromStateNode = (stateNode: StateNode<T>): FlowChartEdge[] => {
+const getEdgesFromStateNode = (stateNode: StateNode<any>): FlowChartEdge[] => {
   if (!stateNode.nextStateIds) {
     return [];
   }
+
   return stateNode.nextStateIds.map((nextStateId) => ({
-    id: `${stateNode.id} - ${nextStateId}`,
-    target: nextStateId,
+    id: `${stateNode.id} - ${nextStateId.id}`,
+    target: nextStateId.id,
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
     type: 'buttonEdge',
     source: stateNode.id,
+    data: {
+        action: nextStateId.action
+    }
   }));
 };
 

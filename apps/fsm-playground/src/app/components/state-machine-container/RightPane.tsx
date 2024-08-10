@@ -1,18 +1,12 @@
 import React from 'react';
 import { LayoutFlow } from '../flow-chart/FlowChartContainer';
 import { ReactFlowProvider } from '@xyflow/react';
-import { Fsm } from '@fsm-challenge/fsm';
 import styled from 'styled-components';
-import { Button } from '@mui/material';
 import { useStateMachineContext } from '../../context/active-state-context/StateMachineContext';
 
-interface RightPaneProps {
 
-}
-
-export const RightPane: React.FC<RightPaneProps> = ({
-}) => {
-    const {onConnectSteps, fsm, onCreateNode} = useStateMachineContext()
+export const RightPane: React.FC = () => {
+    const {onConnectSteps, fsm} = useStateMachineContext()
   return (
     <StyledRightPane>
       <ReactFlowProvider>

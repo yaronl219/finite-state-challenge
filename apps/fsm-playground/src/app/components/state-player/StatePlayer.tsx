@@ -3,6 +3,7 @@ import { StateNodeContainer } from '../state-node/StateNodeContainer';
 import styled from 'styled-components';
 import { Button } from '@mui/material';
 import { ActiveState } from '../../types/active-state';
+import { NextStateButton } from './NextStateButton';
 
 interface StatePlayerProps {
   onRenameNode: (id: string, newNodeName: string) => void;
@@ -28,15 +29,7 @@ export const StatePlayer: React.FC<StatePlayerProps> = ({
       />
       </ActiveStateNodeContainer>
       <ButtonContainer>
-        {activeState?.nextStates.map((nextState) => (
-          <Button
-            variant="contained"
-            key={nextState.id}
-            onClick={() => onAdvanceStep(nextState.id)}
-          >
-            Adavnce state to "{nextState.name}"
-          </Button>
-        ))}
+        {activeState?.nextStates.map((nextState) => <NextStateButton key={nextState.id} activeState={activeState} nextState={nextState} onAdvanceStep={onAdvanceStep}/>)}
       </ButtonContainer>
     </ StyledStatePlayerContainer>
   );
