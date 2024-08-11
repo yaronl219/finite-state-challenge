@@ -2,7 +2,7 @@
   "name": "@fsm-challenge/source",
   "version": "0.0.0",
   "license": "MIT",
-  "homepage": "https://yaronl219.github.io/finite-state-challenge",
+  "homepage": "https://yaronl219.github.io/finite-state-challenge/",
   "scripts": {
     "start-react-app": "npx nx serve fsm-playground",
     "test": "npx nx test --all",
