@@ -1,8 +1,14 @@
 import { StateNode } from '@fsm-challenge/fsm';
 import { v4 as uuidv4 } from 'uuid';
+import { sleep } from '../utils/sleep';
+import { SavedStateMacine } from '../types/saved-state-machine';
 
 const MOCK_KEY = 'mock-fsms';
 const setUpMockMode = () => {
+  const mock = window.localStorage.getItem(MOCK_KEY);
+  if (mock) {
+    return;
+  }
   const streetLightFsm: StateNode<any>[] = [
     {
       id: '1',
@@ -115,16 +121,6 @@ const setUpMockMode = () => {
     },
   ];
 
-  //   const mockFsms = [streetLightFsm, dogFsm, munchkinFsm].reduce(
-  //     (map, mockFsm) => ({
-  //       ...map,
-  //       [uuidv4()]: {
-  //         name:
-  //         fsm: mockFsm,
-  //     }),
-  //     {}
-  //   );
-
   const mockFsms = {
     [uuidv4()]: {
       name: 'Dog feeding',
@@ -139,7 +135,7 @@ const setUpMockMode = () => {
       fsm: streetLightFsm,
     },
   };
-  window.localStorage.setItem(MOCK_KEY, JSON.stringify(mockFsms ));
+  window.localStorage.setItem(MOCK_KEY, JSON.stringify(mockFsms));
 };
 
 class FsmService {
@@ -157,11 +153,70 @@ class FsmService {
     return JSON.parse(mock);
   }
 
-  public async getFsmById(id: string): Promise<StateNode<any>[] | undefined> {
+  private setMock(
+    mock: Record<string, { fsm: StateNode<any>[]; name: string }>
+  ) {
+    window.localStorage.setItem(MOCK_KEY, JSON.stringify(mock));
+  }
+
+  public async getFsmById(
+    id: string
+  ): Promise<{ id: string; name: string; fsm: StateNode<any>[] } | undefined> {
     if (this.isMockMode) {
       const mock = this.getMock();
-      return Promise.resolve(mock[id]?.fsm);
+      await sleep(200); // mock latency
+      const foundMock = mock?.[id];
+
+      if (!foundMock) {
+        return;
+      }
+
+      return Promise.resolve({
+        id,
+        name: foundMock.name,
+        fsm: foundMock.fsm,
+      });
     }
+  }
+
+  public async updateFsm(
+    id: string,
+    { name, fsm }: { name: string; fsm: StateNode<any>[] }
+  ): Promise<SavedStateMacine> {
+    if (this.isMockMode) {
+      const mock = this.getMock();
+      mock[id] = { name, fsm };
+      this.setMock(mock);
+      await sleep(200); // mock latency
+      return {
+        id,
+        name,
+        fsm,
+      };
+    }
+    throw new Error('not implemented');
+  }
+
+  public async createNewFsm({
+    name,
+    fsm,
+  }: {
+    name: string;
+    fsm: StateNode<any>[];
+  }): Promise<SavedStateMacine> {
+    if (this.isMockMode) {
+      const id = uuidv4();
+      const mock = this.getMock();
+      mock[id] = { name, fsm };
+      this.setMock(mock);
+      await sleep(200); // mock latency
+      return {
+        id,
+        name,
+        fsm,
+      };
+    }
+    throw new Error('not implemented');
   }
 
   public async getFsmsBySearchString(
@@ -182,6 +237,7 @@ class FsmService {
             name,
           };
         });
+      await sleep(200); // mock latency
       return Promise.resolve(matches);
     }
     return [];

@@ -11,12 +11,12 @@ describe('Finite state machine tests', () => {
           {
             id: '1',
             name: 'a',
-            nextStateIds: [{id:'2'}],
+            nextStateIds: [{ id: '2' }],
           },
           {
             id: '2',
             name: 'b',
-            nextStateIds: [{id:'1'}],
+            nextStateIds: [{ id: '1' }],
           },
         ];
 
@@ -37,12 +37,12 @@ describe('Finite state machine tests', () => {
           {
             id: '1',
             name: 'a',
-            nextStateIds: [{id: '2'}],
+            nextStateIds: [{ id: '2' }],
           },
           {
             id: '2',
             name: 'b',
-            nextStateIds: [{id: '3'}],
+            nextStateIds: [{ id: '3' }],
           },
           {
             id: '3',
@@ -68,17 +68,17 @@ describe('Finite state machine tests', () => {
           {
             id: '1',
             name: 'a',
-            nextStateIds: [{id: '2'}, {id: '3'}],
+            nextStateIds: [{ id: '2' }, { id: '3' }],
           },
           {
             id: '2',
             name: 'b',
-            nextStateIds: [{id: '1'}],
+            nextStateIds: [{ id: '1' }],
           },
           {
             id: '3',
             name: 'b',
-            nextStateIds: [{id: '1'}],
+            nextStateIds: [{ id: '1' }],
           },
         ];
 
@@ -104,7 +104,7 @@ describe('Finite state machine tests', () => {
           {
             id: '1',
             name: 'a',
-            nextStateIds: [{id: '2'}],
+            nextStateIds: [{ id: '2' }],
             onEnterState: (_, advance) => {
               setTimeout(() => {
                 advance('2');
@@ -124,7 +124,7 @@ describe('Finite state machine tests', () => {
 
         await sleep(1000);
 
-        expect(fsm.getCurrentState()).toEqual(stateNodes[1])
+        expect(fsm.getCurrentState()).toEqual(stateNodes[1]);
       });
     });
 
@@ -134,12 +134,12 @@ describe('Finite state machine tests', () => {
           {
             id: '1',
             name: 'a',
-            nextStateIds: [{id: '2'}],
+            nextStateIds: [{ id: '2' }],
           },
           {
             id: '2',
             name: 'b',
-            nextStateIds: [{id: '1'}],
+            nextStateIds: [{ id: '1' }],
           },
         ];
         const onStateChange = jest.fn();
@@ -159,13 +159,13 @@ describe('Finite state machine tests', () => {
             id: '1',
             name: 'a',
             onEnterState: jest.fn(),
-            nextStateIds: [{id: '2'}],
+            nextStateIds: [{ id: '2' }],
           },
           {
             id: '2',
             name: 'b',
             onEnterState: jest.fn(),
-            nextStateIds: [{id: '1'}],
+            nextStateIds: [{ id: '1' }],
           },
         ];
         const fsm = new Fsm({
@@ -184,13 +184,13 @@ describe('Finite state machine tests', () => {
             id: '1',
             name: 'a',
             onExitState: jest.fn(),
-            nextStateIds: [{id: '2'}],
+            nextStateIds: [{ id: '2' }],
           },
           {
             id: '2',
             name: 'b',
             onExitState: jest.fn(),
-            nextStateIds: [{id: '1'}],
+            nextStateIds: [{ id: '1' }],
           },
         ];
         const fsm = new Fsm({
@@ -206,6 +206,63 @@ describe('Finite state machine tests', () => {
   });
 
   describe('Error tests', () => {
-    // todo: add error
+    it('Should throw if next id does not exist', () => {
+      const stateNodes = [
+        {
+          id: '1',
+          name: 'a',
+          onExitState: jest.fn(),
+          nextStateIds: [{ id: 'does not exist' }],
+        },
+        {
+          id: '2',
+          name: 'b',
+          onExitState: jest.fn(),
+          nextStateIds: [{ id: '1' }],
+        },
+      ];
+      const fsm = new Fsm({
+        stateNodes,
+      });
+
+      expect(fsm.advance).toThrow();
+    });
+
+    it('Should throw if provided id does not exist', () => {
+
+      const fsm = new Fsm({
+        stateNodes: [],
+      });
+
+      expect(() => fsm.setActiveStateById('does not exist')).toThrow();
+    });
+
+    it('Should throw if there is more than one path and id not provided', () => {
+
+      const stateNodes = [
+        {
+          id: '1',
+          name: 'a',
+          nextStateIds: [{ id: '2' }, {id: '3'}],
+        },
+        {
+          id: '2',
+          name: 'b',
+        
+          nextStateIds: [{ id: '1' }],
+        },
+        {
+          id: '3',
+          name: 'c',
+          nextStateIds: [{ id: '1' }],
+        },
+      ];
+      const fsm = new Fsm({
+        stateNodes,
+      });
+
+
+      expect(() => fsm.advance()).toThrow();
+    });
   });
 });

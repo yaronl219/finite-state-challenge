@@ -1,17 +1,19 @@
 
 import styled from 'styled-components';
 import { StatePlayerContainer } from '../state-player/StatePlayerContainer';
-import { RightPane } from './RightPane';
+import { StateMachineMap } from './StateMachineMap';
 import { StateMachineProvider } from '../../context/active-state-context/StateMachineProvider';
+import { SavedStateMachineContainer } from '../saved-state-machines/SavedStateMachineContainer';
 
 export const StateMachineContainer = () => {
   return (
     <StyledContainer>
       <StateMachineProvider>
+        <SavedStateMachineContainer />
         <StatePlayerContainer
         />
-        <VerticalBreak />
-        <RightPane
+        
+        <StateMachineMap
         />
       </StateMachineProvider>
     </StyledContainer>
@@ -20,10 +22,6 @@ export const StateMachineContainer = () => {
 
 const StyledContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1px 1fr;
+  grid-template-columns: 20rem 1fr 1fr;
   height: calc(100vh - 4rem)
 `;
-
-const VerticalBreak = styled.div`
-  background-color: black;
-`

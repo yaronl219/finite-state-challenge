@@ -4,108 +4,23 @@ import { ActiveState } from '../../types/active-state';
 import { Fsm, StateNode } from '@fsm-challenge/fsm';
 import { v4 as uuidv4 } from 'uuid';
 import { isEqual } from 'lodash';
+import { fsmService } from '../../services/fsmService';
 
 interface StateMachineProviderProps {
   children: React.ReactNode;
 }
 
-const munchkinFsm: StateNode<any>[] = [
-  {
-    id: '1',
-    name: 'Start',
-    nextStateIds: [
-      { id: '2', action: 'm' },
-      { id: 'error', action: 'not m' },
-    ],
-  },
-  {
-    id: '2',
-    name: 'm found',
-    nextStateIds: [
-      { id: '3', action: 'u' },
-      { id: 'error', action: 'not u' },
-    ],
-  },
-  {
-    id: '3',
-    name: 'u found',
-    nextStateIds: [
-      { id: '4', action: 'n' },
-      { id: 'error', action: 'not n' },
-    ],
-  },
-  {
-    id: '4',
-    name: 'n found',
-    nextStateIds: [
-      { id: '5', action: 'c' },
-      { id: 'error', action: 'not c' },
-    ],
-  },
-  {
-    id: '5',
-    name: 'c found',
-    nextStateIds: [
-      { id: '6', action: 'h' },
-      { id: 'error', action: 'not h' },
-    ],
-  },
-  {
-    id: '6',
-    name: 'c found',
-    nextStateIds: [
-      { id: '7', action: 'k' },
-      { id: 'error', action: 'not k' },
-    ],
-  },
-  {
-    id: '7',
-    name: 'k found',
-    nextStateIds: [
-      { id: '8', action: 'i' },
-      { id: 'error', action: 'not i' },
-    ],
-  },
-  {
-    id: '8',
-    name: 'i found',
-    nextStateIds: [
-      { id: '9', action: 'n' },
-      { id: 'error', action: 'not n' },
-    ],
-  },
-  {
-    id: '9',
-    name: 'Success',
-    nextStateIds: [],
-  },
-  {
-    id: 'error',
-    name: 'error',
-  },
-];
-
-const dogFsm: StateNode<any>[] = [
-  {
-    id: '1',
-    name: 'dog eating',
-    nextStateIds: [{ id: '2', action: 'Feed the dog' }],
-  },
-  {
-    id: '2',
-    name: 'dog hungry',
-    nextStateIds: [{ id: '1', action: 'Dog finished eating' }],
-  },
-];
-
 export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
   children,
 }) => {
-  const [stateNodes, setStateNodes] = useState<StateNode<any>[]>(munchkinFsm);
+  const [stateNodes, setStateNodes] = useState<StateNode<any>[]>([]);
 
   const fsm = useMemo(() => new Fsm({ stateNodes }), [stateNodes]);
 
   const [activeState, setActiveState] = useState<ActiveState<any> | null>(null);
+
+  const [savedStateMachineId, setSavedStateMachineId] = useState<string>('')
+  const [savedStateMachineName, setSavedMachineName] = useState<string>('')
 
   useEffect(() => {
     if (!stateNodes.length) {
@@ -131,7 +46,6 @@ export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
       fsm.setActiveStateById(stateNodes[0]?.id);
     }
 
-    console.log('render');
     setActiveState({
       ...fsm.getCurrentState(),
       nextStates: fsm.getNextNodes(),
@@ -271,6 +185,37 @@ export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
     []
   );
 
+  const fetchAndSetSavedStateMachine = useCallback(async (id: string) => {
+    const savedFsm = await fsmService.getFsmById(id);
+    if (!savedFsm) {
+        throw new Error('Could not find state machine for given ID')
+    }
+    setSavedStateMachineId(id)
+    setSavedMachineName(savedFsm.name)
+    setStateNodes(savedFsm.fsm)
+  }, [setStateNodes]);
+
+  const onChangeSavedStateMachineName = useCallback((newName: string) => {
+    setSavedMachineName(newName)
+  }, [setSavedMachineName])
+
+  const onSaveStateMachine = useCallback(async () => {
+    const updateObject = {name: savedStateMachineName || 'Unnamed state machine', fsm: stateNodes}
+    if (savedStateMachineId) {
+        return await fsmService.updateFsm(savedStateMachineId, updateObject)
+    }
+    const res = await fsmService.createNewFsm(updateObject)
+    setSavedStateMachineId(res.id)
+    return res
+  }, [savedStateMachineId, savedStateMachineName, stateNodes])
+
+  const onCreateNew = useCallback(() => {
+    setActiveState(null)
+    setStateNodes([])
+    setSavedStateMachineId('')
+    setSavedMachineName('')
+  }, [])
+  
   return (
     <StateMachineContext.Provider
       value={{
@@ -285,6 +230,12 @@ export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
         onRemoveNode,
         onRenameNode,
         onRenameAction,
+        fetchAndSetSavedStateMachine,
+        savedStateMachineId,
+        savedStateMachineName,
+        onChangeSavedStateMachineName,
+        onSaveStateMachine,
+        onCreateNew
       }}
     >
       {children}

@@ -47,7 +47,7 @@ const getEdgesFromStateNode = (stateNode: StateNode<any>): FlowChartEdge[] => {
     type: 'buttonEdge',
     source: stateNode.id,
     data: {
-        action: nextStateId.action
+        action: nextStateId.action ?? ''
     }
   }));
 };

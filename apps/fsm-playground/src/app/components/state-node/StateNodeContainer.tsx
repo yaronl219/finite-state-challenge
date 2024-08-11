@@ -22,7 +22,7 @@ export const StateNodeContainer: React.FC<StateNodeProps> = ({
         value={title}
         variant='standard'
         onChange={(ev) => onRenameNode(ev.target.value)}
-      />: <Typography>{title}</Typography> }
+      />: <NoWrapTypography>{title}</NoWrapTypography> }
       
     </StyledNode>
   );
@@ -38,3 +38,9 @@ const StyledNode = styled.div<{ isActive: boolean }>`
   width: ${nodeSize}px;
   background-color: ${({ isActive }) => (isActive ? '#91bce6' : '#d6ebff')};
 `;
+
+const NoWrapTypography = styled(Typography)`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+`

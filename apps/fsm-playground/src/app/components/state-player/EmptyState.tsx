@@ -1,5 +1,4 @@
 import { Typography } from '@mui/material';
-import React from 'react';
 import styled from 'styled-components';
 
 export const EmptyState = () => {
@@ -10,4 +9,7 @@ export const EmptyState = () => {
   );
 };
 
-const StyledContainer = styled.div``;
+const StyledContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;

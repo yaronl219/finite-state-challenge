@@ -1,7 +1,6 @@
 import React from 'react';
 import { StateNodeContainer } from '../state-node/StateNodeContainer';
 import styled from 'styled-components';
-import { Button } from '@mui/material';
 import { ActiveState } from '../../types/active-state';
 import { NextStateButton } from './NextStateButton';
 

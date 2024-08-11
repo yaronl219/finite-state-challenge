@@ -5,11 +5,10 @@ import {
   EdgeProps,
   ReactFlowState,
   getBezierPath,
-  useReactFlow,
   useStore,
 } from '@xyflow/react';
 import { useStateMachineContext } from '../../context/active-state-context/StateMachineContext';
-import { Button, IconButton, TextField } from '@mui/material';
+import { TextField, Tooltip } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import styled from 'styled-components';
 import { PrimaryIconButton } from '../design-components/PrimaryIconButton';
@@ -50,20 +49,11 @@ export function CustomEdge({
 }: EdgeProps) {
   const { onDeleteConnection, onRenameAction } = useStateMachineContext();
 
-//   const [edgePath, labelX, labelY] = getBezierPath({
-//     sourceX,
-//     sourceY,
-//     sourcePosition,
-//     targetX,
-//     targetY,
-//     targetPosition,
-//   });
-
   const isBiDirectionEdge = useStore((s: ReactFlowState) => {
     const edgeExists = s.edges.some(
       (e) =>
         (e.source === target && e.target === source) ||
-        (e.target === source && e.source === target),
+        (e.target === source && e.source === target)
     );
 
     return edgeExists;
@@ -94,7 +84,7 @@ export function CustomEdge({
 
   let path = '';
 
-  const offset = sourceX < targetX ? 300 : -300
+  const offset = sourceX < targetX ? 300 : -300;
   if (isBiDirectionEdge) {
     path = getSpecialPath(edgePathParams, offset);
   } else {
@@ -108,7 +98,9 @@ export function CustomEdge({
         <div
           style={{
             position: 'absolute',
-            transform: `translate(-50%, -50%) translate(${centerX + offset / 2}px,${centerY}px)`,
+            transform: `translate(-50%, -50%) translate(${
+              centerX + offset / 2
+            }px,${centerY}px)`,
             fontSize: 12,
             // everything inside EdgeLabelRenderer has no pointer events by default
             // if you have an interactive element, set pointer-events: all
@@ -116,12 +108,26 @@ export function CustomEdge({
           }}
           className="nodrag nopan"
         >
-          <TextField value={data?.action} onChange={onRenameEdge} />
-          <PrimaryIconButton onClick={onEdgeClick}>
-            <DeleteOutlineOutlined />
-          </PrimaryIconButton>
+          <EdgeNameContainer>
+            <StyledTextFieldContainer>
+              <TextField value={data?.action} onChange={onRenameEdge} />
+            </StyledTextFieldContainer>
+            <PrimaryIconButton onClick={onEdgeClick}>
+              <Tooltip title="remove connection">
+                <DeleteOutlineOutlined />
+              </Tooltip>
+            </PrimaryIconButton>
+          </EdgeNameContainer>
         </div>
       </EdgeLabelRenderer>
     </>
   );
 }
+
+const EdgeNameContainer = styled.div`
+  display: flex;
+`;
+
+const StyledTextFieldContainer = styled.div`
+  background-color: #ffffff;
+`;

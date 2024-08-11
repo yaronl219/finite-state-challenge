@@ -4,13 +4,12 @@ import { useStateMachineContext } from '../../context/active-state-context/State
 import { TitleContainer } from './TitleContainer';
 import { StatePlayer } from './StatePlayer';
 import { EmptyState } from './EmptyState';
-
-
+import { Paper } from '@mui/material';
 
 export const StatePlayerContainer: React.FC = () => {
   const { activeState, onAdvanceStep, onRenameNode } = useStateMachineContext();
   return (
-    <StyledContainer>
+    <StyledContainer square>
       <TitleContainer />
       {activeState ? (
         <StatePlayer
@@ -25,7 +24,7 @@ export const StatePlayerContainer: React.FC = () => {
   );
 };
 
-const StyledContainer = styled.div`
+const StyledContainer = styled(Paper)`
   display: flex;
   flex-direction: column;
   padding: 1rem;

@@ -1,51 +1,41 @@
-import { ReactFlow, useNodesState, useEdgesState, Edge } from '@xyflow/react';
+import { ReactFlow, useReactFlow } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 import { CustomNode } from './CustomNode';
-import { Fsm } from '@fsm-challenge/fsm';
 import { useGetFlowChartSchemaFromFsm } from '../../hooks/useGetFlowChartSchemaFromFsm';
 
 import { CustomEdge } from './ButtonEdge';
 import styled from 'styled-components';
 import { useAutoLayoutNodes } from '../../hooks/useAutoLayoutNodes';
-import { PrimaryIconButton } from '../design-components/PrimaryIconButton';
-import { AddOutlined, CategoryOutlined } from '@mui/icons-material';
-import { Tooltip } from '@mui/material';
 import { useStateMachineContext } from '../../context/active-state-context/StateMachineContext';
+import { useEffect } from 'react';
+import { FloatingButtons } from './FloatingButtons';
 
 const customNodes = {
   customNode: CustomNode,
 };
 
-interface LayoutFlowProps {
-  fsm: Fsm<any>;
-  onConnectEdge: (sourceId: string, targetId: string) => void;
-}
-
-export const LayoutFlow: React.FC<LayoutFlowProps> = ({
-  fsm,
-  onConnectEdge,
-}) => {
-  const {onCreateNode} = useStateMachineContext()
+export const LayoutFlow: React.FC = () => {
+  const { onConnectSteps, fsm, onCreateNode, onSaveStateMachine, onCreateNew } = useStateMachineContext();
 
   const { nodes, edges, onEdgesChange, onNodesChange, setEdges, setNodes } =
     useGetFlowChartSchemaFromFsm(fsm);
+  const { fitView } = useReactFlow();
 
   const { layoutNodes } = useAutoLayoutNodes(setNodes, setEdges);
+
+  useEffect(() => {
+    fitView({ minZoom: 0.1, duration: 300 });
+  }, [fitView, nodes]);
+
   return (
     <StyledContainer>
-      <FloatingButtonsContainer>
-        <PrimaryIconButton onClick={onCreateNode}>
-          <Tooltip placement='left' title="Create a new node">
-            <AddOutlined />
-          </Tooltip>
-        </PrimaryIconButton>
-        <PrimaryIconButton onClick={() => layoutNodes(nodes, edges)}>
-          <Tooltip placement='left' title="Relayout the nodes">
-            <CategoryOutlined />
-          </Tooltip>
-        </PrimaryIconButton>
-      </FloatingButtonsContainer>
+      <FloatingButtons
+        layoutNodes={() => layoutNodes(nodes, edges)}
+        onCreateNode={onCreateNode}
+        onCreateNew={onCreateNew}
+        onSaveState={onSaveStateMachine}
+      />
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -53,7 +43,7 @@ export const LayoutFlow: React.FC<LayoutFlowProps> = ({
         nodeTypes={customNodes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={({ source, target }) => onConnectEdge(source, target)}
+        onConnect={({ source, target }) => onConnectSteps(source, target)}
         fitView
         fitViewOptions={{
           padding: 0.2,
@@ -67,13 +57,4 @@ const StyledContainer = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
-`;
-
-const FloatingButtonsContainer = styled.div`
-  position: absolute;
-  right: 0;
-  z-index: 1;
-  flex-direction: column;
-  display: flex;
-  gap: 0.5rem;
 `;
