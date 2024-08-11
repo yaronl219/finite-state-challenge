@@ -6,7 +6,8 @@
   "scripts": {
     "start-react-app": "npx nx serve fsm-playground",
     "test": "npx nx test --all",
-    "deploy": "gh-pages -d build"
+    "predeploy": "npx nx build fsm-playground",
+    "deploy": "gh-pages -d dist/apps/fsm-playground"
   },
   "private": true,
   "dependencies": {
