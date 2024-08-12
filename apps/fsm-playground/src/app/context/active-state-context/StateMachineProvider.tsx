@@ -13,11 +13,11 @@ interface StateMachineProviderProps {
 export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
   children,
 }) => {
-  const [stateNodes, setStateNodes] = useState<StateNode<any>[]>([]);
+  const [stateNodes, setStateNodes] = useState<StateNode[]>([]);
 
   const fsm = useMemo(() => new Fsm({ stateNodes }), [stateNodes]);
 
-  const [activeState, setActiveState] = useState<ActiveState<any> | null>(null);
+  const [activeState, setActiveState] = useState<ActiveState | null>(null);
 
   const [savedStateMachineId, setSavedStateMachineId] = useState<string>('')
   const [savedStateMachineName, setSavedMachineName] = useState<string>('')
@@ -91,7 +91,6 @@ export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
 
   const onDeleteConnection = useCallback(
     (sourceId: string, targetId: string) => {
-      console.log({ sourceId, targetId });
       setStateNodes((stateNodes) =>
         stateNodes.map((stateNode) => {
           if (stateNode.id === sourceId) {
@@ -111,7 +110,7 @@ export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
   );
 
   const onCreateNode = useCallback(() => {
-    const newNode: StateNode<any> = {
+    const newNode: StateNode = {
       id: uuidv4(),
       name: 'New state',
       nextStateIds: [],
@@ -215,7 +214,7 @@ export const StateMachineProvider: React.FC<StateMachineProviderProps> = ({
     setSavedStateMachineId('')
     setSavedMachineName('')
   }, [])
-  
+
   return (
     <StateMachineContext.Provider
       value={{

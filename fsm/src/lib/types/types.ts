@@ -2,7 +2,7 @@ export type NodeTree<T> = Record<string, StateNode<T>>
 
 export type OnChangeStateEvent<T> = (node: StateNode<T>, advance: (id?: string) => void, nodeTree: NodeTree<T>) => void 
 
-export interface StateNode<T> {
+export interface StateNode<T = undefined> {
     id: string;
     name?: string
     onEnterState?: OnChangeStateEvent<T>

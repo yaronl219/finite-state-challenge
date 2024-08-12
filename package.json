@@ -6,7 +6,8 @@
   "scripts": {
     "start-react-app": "npx nx serve fsm-playground",
     "test": "npx nx test --all",
-    "predeploy": "npx nx build fsm-playground",
+    "build": "npx nx build fsm-playground",
+    "predeploy": "npm run build -- --prod --baseHref=/finite-state-challenge/",
     "deploy": "gh-pages -d dist/apps/fsm-playground"
   },
   "private": true,

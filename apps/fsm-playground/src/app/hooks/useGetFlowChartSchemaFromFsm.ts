@@ -10,6 +10,7 @@ import {
 } from '@xyflow/react';
 import { nodeSize } from '../consts/node-size';
 import { isEqual } from 'lodash';
+import { CustomNodeType } from '../types/custom-node-type';
 
 export interface FlowChartSchema {
   nodes: FlowChartNode[];
@@ -17,7 +18,7 @@ export interface FlowChartSchema {
 }
 
 const getFlowChartNode = (
-  stateNode: StateNode<any>,
+  stateNode: StateNode,
   idx: number,
   previousState?: FlowChartNode
 ): FlowChartNode => {
@@ -33,7 +34,7 @@ const getFlowChartNode = (
   };
 };
 
-const getEdgesFromStateNode = (stateNode: StateNode<any>): FlowChartEdge[] => {
+const getEdgesFromStateNode = (stateNode: StateNode): FlowChartEdge[] => {
   if (!stateNode.nextStateIds) {
     return [];
   }
@@ -52,7 +53,7 @@ const getEdgesFromStateNode = (stateNode: StateNode<any>): FlowChartEdge[] => {
   }));
 };
 
-export function useGetFlowChartSchemaFromFsm<T>(fsm: Fsm<T>) {
+export function useGetFlowChartSchemaFromFsm(fsm: Fsm) {
   const [nodes, setNodes, onNodesChange] = useNodesState<FlowChartNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<FlowChartEdge>([]);
 

@@ -4,17 +4,17 @@ import { Fsm, StateNode } from '@fsm-challenge/fsm';
 import { SavedStateMacine } from '../../types/saved-state-machine';
 
 interface IStateMachineContext {
-  activeState: null | ActiveState<any>;
+  activeState: null | ActiveState;
   onSetActiveStateById: (id: string) => void;
   onAdvanceStep: (id?: string) => void;
   onCreateNode: () => void;
   onDeleteConnection: (sourceId: string, targetId: string) => void;
   onConnectSteps: (sourceId: string, targetId: string) => void;
-  stateNodes: StateNode<any>[];
+  stateNodes: StateNode[];
   onRenameNode: (nodeId: string, newName: string) => void;
   onRemoveNode: (nodeId: string) => void
   onRenameAction: (sourceId: string, targetId: string, newName: string) => void
-  fsm: Fsm<any>;
+  fsm: Fsm;
   fetchAndSetSavedStateMachine: (id: string) => Promise<void>
   savedStateMachineId: string,
   savedStateMachineName: string

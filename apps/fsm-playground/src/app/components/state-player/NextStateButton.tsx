@@ -4,8 +4,8 @@ import { ActiveState } from '../../types/active-state';
 import { StateNode } from '@fsm-challenge/fsm';
 
 interface NextStateButtonProps {
-  activeState: ActiveState<any>;
-  nextState: StateNode<any>;
+  activeState: ActiveState;
+  nextState: StateNode;
   onAdvanceStep: (id: string) => void;
 }
 
@@ -19,7 +19,7 @@ export const NextStateButton: React.FC<NextStateButtonProps> = ({
       ({ id }) => nextState.id === id
     )?.action;
     
-    return nextStateAction ?? `Adavnce state to "${nextState.name}"`;
+    return nextStateAction || `Adavnce state to "${nextState.name}"`;
   }, [activeState.nextStateIds, nextState.id, nextState.name]);
 
   return (

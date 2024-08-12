@@ -9,7 +9,7 @@ const setUpMockMode = () => {
   if (mock) {
     return;
   }
-  const streetLightFsm: StateNode<any>[] = [
+  const streetLightFsm: StateNode[] = [
     {
       id: '1',
       name: 'red',
@@ -32,7 +32,7 @@ const setUpMockMode = () => {
     },
   ];
 
-  const dogFsm: StateNode<any>[] = [
+  const dogFsm: StateNode[] = [
     {
       id: '1',
       name: 'dog eating',
@@ -45,7 +45,7 @@ const setUpMockMode = () => {
     },
   ];
 
-  const munchkinFsm: StateNode<any>[] = [
+  const munchkinFsm: StateNode[] = [
     {
       id: '1',
       name: 'Start',
@@ -147,21 +147,21 @@ class FsmService {
     }
   }
 
-  private getMock(): Record<string, { fsm: StateNode<any>[]; name: string }> {
+  private getMock(): Record<string, { fsm: StateNode[]; name: string }> {
     const mock = window.localStorage.getItem(MOCK_KEY);
     if (!mock) return {};
     return JSON.parse(mock);
   }
 
   private setMock(
-    mock: Record<string, { fsm: StateNode<any>[]; name: string }>
+    mock: Record<string, { fsm: StateNode[]; name: string }>
   ) {
     window.localStorage.setItem(MOCK_KEY, JSON.stringify(mock));
   }
 
   public async getFsmById(
     id: string
-  ): Promise<{ id: string; name: string; fsm: StateNode<any>[] } | undefined> {
+  ): Promise<{ id: string; name: string; fsm: StateNode[] } | undefined> {
     if (this.isMockMode) {
       const mock = this.getMock();
       await sleep(200); // mock latency
@@ -181,7 +181,7 @@ class FsmService {
 
   public async updateFsm(
     id: string,
-    { name, fsm }: { name: string; fsm: StateNode<any>[] }
+    { name, fsm }: { name: string; fsm: StateNode[] }
   ): Promise<SavedStateMacine> {
     if (this.isMockMode) {
       const mock = this.getMock();
@@ -202,7 +202,7 @@ class FsmService {
     fsm,
   }: {
     name: string;
-    fsm: StateNode<any>[];
+    fsm: StateNode[];
   }): Promise<SavedStateMacine> {
     if (this.isMockMode) {
       const id = uuidv4();

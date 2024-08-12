@@ -7,7 +7,7 @@ import { NextStateButton } from './NextStateButton';
 interface StatePlayerProps {
   onRenameNode: (id: string, newNodeName: string) => void;
   onAdvanceStep: (id: string) => void;
-  activeState: ActiveState<any>;
+  activeState: ActiveState<unknown>;
 }
 
 export const StatePlayer: React.FC<StatePlayerProps> = ({
@@ -15,6 +15,7 @@ export const StatePlayer: React.FC<StatePlayerProps> = ({
   onRenameNode,
   onAdvanceStep,
 }) => {
+
   return (
     <StyledStatePlayerContainer>
         <ActiveStateNodeContainer>

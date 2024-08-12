@@ -1,6 +1,6 @@
 import { NodeTree, StateNode, StateMachineProps } from './types/types';
 
-export class Fsm<T> {
+export class Fsm<T = undefined> {
   private readonly onStateChange: StateMachineProps<T>['onStateChange'];
   private readonly nodeTree: NodeTree<T>;
   private readonly stateNodes: StateNode<T>[]
